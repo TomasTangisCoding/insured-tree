@@ -6,6 +6,7 @@ import (
 
 func Register() {
 	r := gin.Default()
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 
 	api := r.Group("/api")
 	routeUser := api.Group("/user")
