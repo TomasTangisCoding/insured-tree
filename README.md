@@ -36,5 +36,5 @@
    ```
 
 4. 在瀏覽器訪問 
-`http://localhost:8080/api/user/tree/{id}`
-`http://localhost:8080/api/user/{id}`
+    `http://localhost:8080/api/user/tree/{id}`
+    `http://localhost:8080/api/user/{id}`
