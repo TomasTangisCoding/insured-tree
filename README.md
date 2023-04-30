@@ -35,4 +35,6 @@
    go run main.go
    ```
 
-4. 在瀏覽器或postman中訪問 `http://localhost:8080/api/user/tree/{id}` 或 `http://localhost:8080/api/user/{id}` 即可。
+4. 在瀏覽器訪問 
+`http://localhost:8080/api/user/tree/{id}`
+`http://localhost:8080/api/user/{id}`
