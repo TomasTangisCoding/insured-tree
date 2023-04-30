@@ -1,0 +1,1 @@
+dsn: "root:@tcp(localhost:3306)/customer?parseTime=True"

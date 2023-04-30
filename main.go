@@ -2,12 +2,13 @@ package main
 
 import (
 	"insured/app"
-	"insured/db"
+	"insured/initiate"
 )
 
 func main() {
 
-	db.Connect()
+	initiate.SetConfig()
+	initiate.ConnectDB()
 
 	app.Register()
 }

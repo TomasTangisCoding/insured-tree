@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"insured/db"
+	"insured/initiate"
 	"log"
 	"time"
 )
@@ -37,7 +37,7 @@ func (u *User) GetUsers(queryId string) ([]User, error) {
 		LIMIT ?`
 
 	var users []User
-	result := db.DBconnect.Raw(query, id, limit).Scan(&users)
+	result := initiate.DBconnect.Raw(query, id, limit).Scan(&users)
 	if result.Error != nil {
 		log.Printf("%v", result.Error)
 		return nil, fmt.Errorf("failed to get users")
@@ -48,7 +48,7 @@ func (u *User) GetUsers(queryId string) ([]User, error) {
 
 func (u *User) SearchUser(query string) ([]User, error) {
 	users := []User{}
-	result := db.DBconnect.Where("ID", query).Find(&users)
+	result := initiate.DBconnect.Where("ID", query).Find(&users)
 	if result.Error != nil {
 		log.Printf("%v", result.Error)
 		return nil, result.Error
