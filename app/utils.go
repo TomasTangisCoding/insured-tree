@@ -29,54 +29,54 @@ func BuildUserTree(users []User) ([]*UserTree, error) {
 		log.Printf("%v", err)
 		return nil, err
 	}
-	root := getUserById(rootId, users)
-	if root == nil {
+
+	userMap := createUserMap(users)
+
+	root, ok := userMap[rootId]
+	if !ok {
 		err := fmt.Errorf("user with ID %d not found", rootId)
 		log.Printf("%v", err)
 		return nil, err
 	}
 
-	buildSubtree(root, users)
+	buildSubtree(root)
 
 	return pointerToSlice(root), nil
 }
 
-func buildSubtree(node *UserTree, users []User) {
-
-	if node.LeftChild != nil {
-		leftChild := getUserById(node.LeftChild.ID, users)
-		if leftChild != nil {
-			node.LeftChild = leftChild
-			buildSubtree(leftChild, users)
+func createUserMap(users []User) map[uint64]*UserTree {
+	userMap := make(map[uint64]*UserTree, len(users))
+	for i := range users {
+		userMap[users[i].ID] = &UserTree{
+			ID:         users[i].ID,
+			Name:       users[i].Name,
+			Email:      users[i].Email,
+			ReferrerID: users[i].ReferrerID,
+			ParentID:   users[i].ParentID,
+			IsDelete:   users[i].IsDelete,
+			CreatedAt:  users[i].CreatedAt.Format("2006-01-02 15:04:05"),
 		}
+	}
+
+	for _, user := range users {
+		if user.LeftChild != 0 {
+			userMap[user.ID].LeftChild = userMap[user.LeftChild]
+		}
+		if user.RightChild != 0 {
+			userMap[user.ID].RightChild = userMap[user.RightChild]
+		}
+	}
+	return userMap
+}
+
+func buildSubtree(node *UserTree) {
+	if node.LeftChild != nil {
+		buildSubtree(node.LeftChild)
 	}
 
 	if node.RightChild != nil {
-		rightChild := getUserById(node.RightChild.ID, users)
-		if rightChild != nil {
-			node.RightChild = rightChild
-			buildSubtree(rightChild, users)
-		}
+		buildSubtree(node.RightChild)
 	}
-}
-
-func getUserById(id uint64, users []User) *UserTree {
-	for _, user := range users {
-		if user.ID == id {
-			return &UserTree{
-				ID:         user.ID,
-				Name:       user.Name,
-				Email:      user.Email,
-				ReferrerID: user.ReferrerID,
-				ParentID:   user.ParentID,
-				IsDelete:   user.IsDelete,
-				LeftChild:  getUserById(user.LeftChild, users),
-				RightChild: getUserById(user.RightChild, users),
-				CreatedAt:  user.CreatedAt.Format("2006-01-02 15:04:05"),
-			}
-		}
-	}
-	return nil
 }
 
 func pointerToSlice(pointer *UserTree) []*UserTree {
