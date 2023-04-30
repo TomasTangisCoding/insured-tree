@@ -7,12 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserController is a struct that holds the methods for handling user requests
 type UserController struct {
-	userService UserService // inject the user service interface as a dependency
+	userService UserService
 }
 
-// NewUserController creates and returns a new UserController instance
 func NewUserController(userService UserService) *UserController {
 	return &UserController{
 		userService: userService,
@@ -21,7 +19,7 @@ func NewUserController(userService UserService) *UserController {
 
 func (u *UserController) GetUserTree(c *gin.Context) {
 	query := c.Param("id")
-	users, err := u.userService.GetUserTree(query) // call the user service method to get users
+	users, err := u.userService.GetUserTree(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Printf("%v", err)
@@ -34,7 +32,7 @@ func (u *UserController) GetUserTree(c *gin.Context) {
 
 func (u *UserController) SearchUser(c *gin.Context) {
 	query := c.Param("id")
-	users, err := u.userService.SearchUser(query) // call the user service method to search users by query
+	users, err := u.userService.SearchUser(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Printf("%v", err)
@@ -56,7 +54,7 @@ func (u *UserController) SearchUser(c *gin.Context) {
 // 	user, err := u.userService.CreateUser(request.Name) // call the user service method to create a user with the given name
 // 	if err != nil {
 // 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//      log.Fatal(err)
+// 		log.Fatal(err)
 // 		return
 // 	}
 // 	c.JSON(http.StatusOK, gin.H{
