@@ -1,7 +1,9 @@
 # Insured Tree
 
-此專案用於展示一個保戶的二叉樹結構，提供以下兩個API：
+此專案用於展示一個保戶的二叉樹結構。
+要運行此專案請先安裝go ，詳細參考https://go.dev/doc/install
 
+目前提供以下兩個API：
 1. 生成二元樹資料結構，以輸入的 `id` 為根節點，最多顯示四層15個用戶：
    ```
    [GET] /api/user/tree/{id}
@@ -25,9 +27,13 @@
    cd insured-tree
    ```
 
-3. 根據DB環境設定 `config.yaml` 中的 `dsn` 參數
+3. 根據本機DB環境設定 `config.yaml` 中的 `dsn` 參數：
 
-4. 創建對應的資料庫表格，可以參考 `user.sql` 中的SQL語句
+   ```bash
+   dsn: "user:password@tcp(localhost:3306)/your_database"
+   ```
+
+4. 創建對應的資料庫表格，可以參考 `user.sql` 中的SQL script
 
 5. 執行服務：
 
