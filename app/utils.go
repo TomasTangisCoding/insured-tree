@@ -41,7 +41,8 @@ func BuildUserTree(users []User) ([]*UserTree, error) {
 
 	buildSubtree(root)
 
-	return pointerToSlice(root), nil
+	tree := []*UserTree{root}
+	return tree, nil
 }
 
 func createUserMap(users []User) map[uint64]*UserTree {
@@ -77,10 +78,4 @@ func buildSubtree(node *UserTree) {
 	if node.RightChild != nil {
 		buildSubtree(node.RightChild)
 	}
-}
-
-func pointerToSlice(pointer *UserTree) []*UserTree {
-	var slice []*UserTree
-	slice = append(slice, pointer)
-	return slice
 }
