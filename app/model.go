@@ -55,22 +55,3 @@ func (u *User) SearchUser(query string) ([]User, error) {
 	}
 	return users, nil
 }
-
-// func (u *User) CreateUser(name, email string, referrerID, parentID uint64) error {
-// 	user := User{
-// 		Name:       name,
-// 		Email:      email,
-// 		ReferrerID: referrerID,
-// 		ParentID:   parentID,
-// 		LeftChild:  0,
-// 		RightChild: 0,
-// 		IsDelete:   false,
-// 		CreatedAt:  time.Now().Format("2006-01-02 15:04:05"),
-// 	}
-// 	result := db.DBconnect.Create(&user)
-// 	if result.Error != nil {
-// 		log.Printf("%v", result.Error)
-// 		return fmt.Errorf("failed to create user")
-// 	}
-// 	return nil
-// }

@@ -42,22 +42,3 @@ func (u *UserController) SearchUser(c *gin.Context) {
 		"users": users,
 	})
 }
-
-// func (u *UserController) CreateUser(c *gin.Context) {
-// 	var request struct {
-// 		Name string `json:"name" binding:"required"`
-// 	}
-// 	if err := c.ShouldBindJSON(&request); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	user, err := u.userService.CreateUser(request.Name) // call the user service method to create a user with the given name
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		log.Fatal(err)
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"user": user,
-// 	})
-// }
