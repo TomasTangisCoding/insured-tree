@@ -5,16 +5,22 @@ import (
 	"log"
 )
 
+var numLeftChild, numRightChild uint64
+var Ch chan CaculateTree
+
 type UserTree struct {
-	ID         uint64    `json:"id"`
-	Name       string    `json:"name"`
-	Email      string    `json:"email"`
-	ReferrerID uint64    `json:"referrer_id"`
-	ParentID   uint64    `json:"parent_id"`
+	ID uint64 `json:"id"`
+	// Name       string    `json:"name"`
+	// ReferrerID uint64 `json:"referrer_id"`
+	// ParentID   uint64    `json:"parent_id"`
 	LeftChild  *UserTree `json:"left_child"`
 	RightChild *UserTree `json:"right_child"`
-	IsDelete   bool      `json:"is_delete"`
-	CreatedAt  string    `json:"created_at"`
+	// IsDelete   bool      `json:"is_delete"`
+	// CreatedAt  string    `json:"created_at"`
+}
+
+type CaculateTree struct {
+	NodeID, NumLeftChild, NumRightChild uint64
 }
 
 func BuildUserTree(users []User) ([]*UserTree, error) {
@@ -38,10 +44,47 @@ func BuildUserTree(users []User) ([]*UserTree, error) {
 		log.Printf("%v", err)
 		return nil, err
 	}
+	numLeftChild, numRightChild = 1, 1
+	// make a channel to store the node and numLetChild and numRightChild
 
+	// Ch <- CaculateTree{1, numLeftChild, numRightChild}
 	buildSubtree(root)
 
+	// for c := range Ch {
+	// 	fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", c.NodeID, c.NumLeftChild, c.NumRightChild)
+	// }
+
+	// queue := []*UserTree{root}
+	// for len(queue) > 0 {
+	// 	node := queue[0]
+	// 	queue = queue[1:]
+
+	// 	if node.LeftChild == nil && numLeftChild < numRightChild {
+	// 		node.LeftChild = &UserTree{ID: 0}
+	// 		numLeftChild++
+	// 	}
+
+	// 	if node.RightChild == nil && numRightChild < numLeftChild {
+	// 		node.RightChild = &UserTree{ID: 0}
+	// 		numRightChild++
+	// 	}
+
+	// 	if node.LeftChild != nil {
+	// 		queue = append(queue, node.LeftChild)
+	// 	}
+
+	// 	if node.RightChild != nil {
+	// 		queue = append(queue, node.RightChild)
+	// 	}
+	// }
+
+	fmt.Println(numLeftChild, numRightChild)
 	tree := []*UserTree{root}
+
+	// for _, child := range tree {
+	// 	fmt.Println(child.ID, child.LeftChild, child.RightChild)
+	// }
+
 	return tree, nil
 }
 
@@ -49,13 +92,12 @@ func createUserMap(users []User) map[uint64]*UserTree {
 	userMap := make(map[uint64]*UserTree, len(users))
 	for i := range users {
 		userMap[users[i].ID] = &UserTree{
-			ID:         users[i].ID,
-			Name:       users[i].Name,
-			Email:      users[i].Email,
-			ReferrerID: users[i].ReferrerID,
-			ParentID:   users[i].ParentID,
-			IsDelete:   users[i].IsDelete,
-			CreatedAt:  users[i].CreatedAt.Format("2006-01-02 15:04:05"),
+			ID: users[i].ID,
+			// Name:       users[i].Name,
+			// ReferrerID: users[i].ReferrerID,
+			// ParentID:   users[i].ParentID,
+			// IsDelete:   users[i].IsDelete,
+			// CreatedAt:  users[i].CreatedAt.Format("2006-01-02 15:04:05"),
 		}
 	}
 
@@ -71,11 +113,23 @@ func createUserMap(users []User) map[uint64]*UserTree {
 }
 
 func buildSubtree(node *UserTree) {
+	// numLeftChild, numRightChild = 1, 1
+	// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
+
 	if node.LeftChild != nil {
 		buildSubtree(node.LeftChild)
+		numLeftChild++
+		// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
+		// fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
 	}
 
 	if node.RightChild != nil {
 		buildSubtree(node.RightChild)
+		numRightChild++
+		// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
+		// fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
 	}
+	fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
+	// fmt.Printf("node.leftChild=%v, rightChild=%v\n", node.LeftChild.ID, node.RightChild.ID)
+	fmt.Println(node)
 }
