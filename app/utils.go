@@ -13,17 +13,20 @@ type UserTree struct {
 	// Name       string    `json:"name"`
 	// ReferrerID uint64 `json:"referrer_id"`
 	// ParentID   uint64    `json:"parent_id"`
-	LeftChild  *UserTree `json:"left_child"`
-	RightChild *UserTree `json:"right_child"`
+	LeftChildID  *UserTree `json:"left_child"`
+	RightChildID *UserTree `json:"right_child"`
 	// IsDelete   bool      `json:"is_delete"`
 	// CreatedAt  string    `json:"created_at"`
 }
 
 type CaculateTree struct {
-	NodeID, NumLeftChild, NumRightChild uint64
+	NodeID, NumLeftChild, NumRightChild, LeftChildID, RightChildID uint64
 }
 
+var userCountMap = make(map[uint64]*CaculateTree)
+
 func BuildUserTree(users []User) ([]*UserTree, error) {
+	// fmt.Println(users)
 	if len(users) == 0 {
 		err := fmt.Errorf("users is empty")
 		log.Printf("%v", err)
@@ -44,48 +47,54 @@ func BuildUserTree(users []User) ([]*UserTree, error) {
 		log.Printf("%v", err)
 		return nil, err
 	}
-	numLeftChild, numRightChild = 1, 1
-	// make a channel to store the node and numLetChild and numRightChild
 
-	// Ch <- CaculateTree{1, numLeftChild, numRightChild}
-	buildSubtree(root)
+	//print userMap
+	// fmt.Println(userMap)
+	// numLeftChild, numRightChild = 1, 1
 
-	// for c := range Ch {
-	// 	fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", c.NodeID, c.NumLeftChild, c.NumRightChild)
+	// buildSubtree(root)
+
+	// numLeftChild, numRightChild = 1, 1
+	// put different rootId into userMap and countSubtree, and get the rootId and numLeftChild and numRightChild
+	// then compare them to know where to put a new user
+	// userCountMap := make(map[uint64]*CaculateTree, len(users))
+	for i := range users {
+		rootId = users[i].ID
+		root, ok = userMap[rootId]
+		if !ok {
+			err := fmt.Errorf("user with ID %d not found", rootId)
+			log.Printf("%v", err)
+			return nil, err
+		}
+		numLeftChild, numRightChild = 1, 1
+		buildSubtree(root)
+		if rootId == 3 {
+			fmt.Printf("rootId=%v, LeftChild=%v, RightChild=%v\n", root.ID, root.LeftChildID, root.RightChildID)
+		}
+		fmt.Printf("rootId=%v, numLeftChild=%v, numRightChild=%v\n", rootId, numLeftChild, numRightChild)
+		userCountMap[users[i].ID] = &CaculateTree{
+			NodeID:        users[i].ID,
+			LeftChildID:   users[i].LeftChildID,
+			RightChildID:  users[i].RightChildID,
+			NumLeftChild:  numLeftChild,
+			NumRightChild: numRightChild,
+		}
+	}
+	// fmt.Println(userCountMap)
+	for key, value := range userCountMap {
+		fmt.Printf("Key: %v, Value: %v\n", key, value)
+	}
+
+	nodeID, childSide := countSubTree(2)
+	fmt.Printf("nodeID=%v, childSide=%v\n", nodeID, childSide)
+	// parent_id = nodeID
+	// if childSide == "left" {
+	// 	LeftChildID = newUser
+	// } else {
+	// 	RightChildID = newUser
 	// }
 
-	// queue := []*UserTree{root}
-	// for len(queue) > 0 {
-	// 	node := queue[0]
-	// 	queue = queue[1:]
-
-	// 	if node.LeftChild == nil && numLeftChild < numRightChild {
-	// 		node.LeftChild = &UserTree{ID: 0}
-	// 		numLeftChild++
-	// 	}
-
-	// 	if node.RightChild == nil && numRightChild < numLeftChild {
-	// 		node.RightChild = &UserTree{ID: 0}
-	// 		numRightChild++
-	// 	}
-
-	// 	if node.LeftChild != nil {
-	// 		queue = append(queue, node.LeftChild)
-	// 	}
-
-	// 	if node.RightChild != nil {
-	// 		queue = append(queue, node.RightChild)
-	// 	}
-	// }
-
-	fmt.Println(numLeftChild, numRightChild)
-	tree := []*UserTree{root}
-
-	// for _, child := range tree {
-	// 	fmt.Println(child.ID, child.LeftChild, child.RightChild)
-	// }
-
-	return tree, nil
+	return []*UserTree{root}, nil
 }
 
 func createUserMap(users []User) map[uint64]*UserTree {
@@ -102,34 +111,79 @@ func createUserMap(users []User) map[uint64]*UserTree {
 	}
 
 	for _, user := range users {
-		if user.LeftChild != 0 {
-			userMap[user.ID].LeftChild = userMap[user.LeftChild]
+		if user.LeftChildID != 0 {
+			userMap[user.ID].LeftChildID = userMap[user.LeftChildID]
 		}
-		if user.RightChild != 0 {
-			userMap[user.ID].RightChild = userMap[user.RightChild]
+		if user.RightChildID != 0 {
+			userMap[user.ID].RightChildID = userMap[user.RightChildID]
 		}
 	}
 	return userMap
 }
 
 func buildSubtree(node *UserTree) {
-	// numLeftChild, numRightChild = 1, 1
-	// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
-
-	if node.LeftChild != nil {
-		buildSubtree(node.LeftChild)
+	if node.LeftChildID != nil {
+		buildSubtree(node.LeftChildID)
 		numLeftChild++
-		// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
-		// fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
+		fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
 	}
 
-	if node.RightChild != nil {
-		buildSubtree(node.RightChild)
+	if node.RightChildID != nil {
+		buildSubtree(node.RightChildID)
 		numRightChild++
-		// Ch <- CaculateTree{node.ID, numLeftChild, numRightChild}
-		// fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
+		fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
 	}
 	fmt.Printf("node=%v, numLeftChild=%v, numRightChild=%v\n", node.ID, numLeftChild, numRightChild)
-	// fmt.Printf("node.leftChild=%v, rightChild=%v\n", node.LeftChild.ID, node.RightChild.ID)
-	fmt.Println(node)
+}
+
+// func countSubTree(userId uint64) (uint64, string) {
+// 	fmt.Println("1", userCountMap[userId].NodeID, userCountMap[userId].LeftChildID, userCountMap[userId].RightChildID, userCountMap[userId].NumLeftChild, userCountMap[userId].NumRightChild)
+
+// 	if userCountMap[userId].LeftChildID == 0 || userCountMap[userId].RightChildID == 0 {
+// 		if userCountMap[userId].NumLeftChild == 1 {
+// 			return userCountMap[userId].NodeID, "left"
+// 		} else if userCountMap[userId].NumRightChild == 1 {
+// 			return userCountMap[userId].NodeID, "right"
+// 		}
+// 	}
+
+// 	if userCountMap[userId].RightChildID != 0 && userCountMap[userId].NumLeftChild > userCountMap[userId].NumRightChild {
+// 		fmt.Println("3", userCountMap[userId].NodeID, userCountMap[userId].LeftChildID, userCountMap[userId].RightChildID, userCountMap[userId].NumLeftChild, userCountMap[userId].NumRightChild)
+
+// 		countSubTree(userCountMap[userId].RightChildID)
+
+// 		// if userCountMap[userId].NumLeftChild == 1 {
+// 		// 	return userCountMap[userId].NodeID, "left"
+// 		// } else if userCountMap[userId].NumRightChild == 1 {
+// 		// 	return userCountMap[userId].NodeID, "right"
+// 		// }
+
+// 	} else if userCountMap[userId].LeftChildID != 0 && userCountMap[userId].NumLeftChild < userCountMap[userId].NumRightChild {
+// 		fmt.Println("4", userCountMap[userId].NodeID, userCountMap[userId].LeftChildID, userCountMap[userId].RightChildID, userCountMap[userId].NumLeftChild, userCountMap[userId].NumRightChild)
+
+// 		countSubTree(userCountMap[userId].LeftChildID)
+
+// 		// if userCountMap[userId].NumLeftChild == 1 {
+// 		// 	return userCountMap[userId].NodeID, "left"
+// 		// } else if userCountMap[userId].NumRightChild == 1 {
+// 		// 	return userCountMap[userId].NodeID, "right"
+// 		// }
+// 	}
+
+// 	fmt.Println("2", userCountMap[userId].NodeID, userCountMap[userId].LeftChildID, userCountMap[userId].RightChildID, userCountMap[userId].NumLeftChild, userCountMap[userId].NumRightChild)
+
+// 	return 999, "right"
+// }
+
+func countSubTree(userId uint64) (uint64, string) {
+
+	if userCountMap[userId].NumLeftChild < userCountMap[userId].NumRightChild && userCountMap[userId].LeftChildID != 0 {
+		return countSubTree(userCountMap[userId].LeftChildID)
+	} else if userCountMap[userId].NumLeftChild >= userCountMap[userId].NumRightChild && userCountMap[userId].RightChildID != 0 {
+		return countSubTree(userCountMap[userId].RightChildID)
+	} else if userCountMap[userId].NumLeftChild == 1 && userCountMap[userId].NumRightChild == 1 {
+		return userCountMap[userId].NodeID, "left"
+	}
+	return userCountMap[userId].NodeID, "right"
+
 }
