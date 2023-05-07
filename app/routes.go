@@ -15,6 +15,7 @@ func Register() {
 
 	routeUser.GET("/tree/:id", userController.GetUserTree)
 	routeUser.GET("/:id", userController.SearchUser)
+	routeUser.POST("", userController.CreateUser)
 
 	r.Run(":8080")
 }

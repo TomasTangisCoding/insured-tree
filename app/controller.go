@@ -42,3 +42,23 @@ func (u *UserController) SearchUser(c *gin.Context) {
 		"users": users,
 	})
 }
+
+func (u *UserController) CreateUser(c *gin.Context) {
+	var request struct {
+		Name       string `json:"name" binding:"required"`
+		ReferrerID uint64 `json:"referrer_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := u.userService.CreateUser(request.Name, request.ReferrerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Fatal(err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
+}
